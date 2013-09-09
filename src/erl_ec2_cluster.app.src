@@ -1,0 +1,7 @@
+%%-*- mode: erlang -*-
+{application, 'erl_ec2_cluster',
+ [
+  {description, "Utils for Clustering ec2"},
+  {vsn, "1"},
+  {mod, {e2_application, [ec2c_app]}}
+   ]}.

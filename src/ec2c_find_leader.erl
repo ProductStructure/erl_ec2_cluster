@@ -5,6 +5,8 @@
 -export([start_link/1, handle_task/1]).
 -behavior(e2_task).
 -spec(get_nodes() -> [node()]).
+
+
 get_nodes() ->
   lists:sort(nodes() ++ [node()]).
 
@@ -33,9 +35,8 @@ load_apps(Applications) ->
 enable_app(State,Application) ->
   ok = application:permit(Application, State),
   case State of 
-    true -> resource_discovery:add_resource_tuple({Application, node()});
+    true -> resource_discovery:add_local_resource_tuple({Application, node()});
     false -> ok
-
   end,
   ok.
 
@@ -59,14 +60,14 @@ resource_is_avalable(ResourceName) ->
   end.
 
 
-
 start_link(_) ->
-  Apps  = application:get_env(applications),
+  {ok,Apps}  = application:get_env(applications),
   resource_discovery:add_target_resource_types(Apps),
   load_apps(Apps),
   handle_task(Apps),
   resource_discovery:trade_resources(),
   e2_task:start_link(?MODULE, Apps, [{repeat, 30000}]).
+
 
 handle_task(Apps) ->
   [resource_is_avalable(App) || App <- Apps],
